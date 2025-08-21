@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anthem | TryHackMe Walkthrough</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <header>
+    <h1>Anthem | TryHackMe Walkthrough</h1>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../writeups/index.html">Write-Ups</a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Overview -->
+    <section>
+      <h2>Overview</h2>
+
+        <img src="../images/Anthem/Anthem_Title.png" 
+             alt="Anthem Page showing Administrator name" 
+             style="display: block; margin: center; max-width:100%; border:1px solid #ccc; padding:5px;">
+
+      <p>Anthem is a beginner-friendly TryHackMe room focused on enumeration. The goal is to explore open ports, analyze the website, and practice fundamental reconnaissance skills.</p>
+      <p>Welcome to this complete walkthrough of Anthem. This guide explains each step in detail, including the reasoning behind “obvious” answers, so new CTF participants can learn rather than blindly follow instructions.</p>
+      <p>I’ll share not only my successes, but also the mistakes and rabbit holes encountered along the way. Every misstep is part of the journey, and showing the full process helps illustrate how each answer is truly earned through exploration.</p>
+      <p>Resist the temptation to skim for quick solutions. Use this walkthrough to deepen your understanding, because chasing imaginary points won’t develop your skills. Let’s dive into Anthem and start the adventure!</p>
+    </section>
+
+    <!-- Task 1 -->
+    <section>
+      <h2>Task 1 – Website Analysis</h2>
+
+      <article>
+
+        <h3>Reconnaissance</h3>
+
+        <p>The first step is to discover which ports are open and which services are running on the target. This helps us plan the next actions efficiently.</p>
+        <p>We start by running <strong>Nmap</strong>. (While there are other options like Rustscan or Masscan, I preferred using Nmap.)</p>
+
+        <p><strong>Nmap (Network Mapper)</strong> is a free tool used to scan and explore networks. In simple words:</p>
+
+        <ul style="list-style-type: disc; color: white; padding-left: 20px;">
+          <li>🖥️ It checks which devices are connected to a network.</li>
+          <li>🔓 It finds open ports (like doors into a computer).</li>
+          <li>🛡️ It helps spot security risks or vulnerabilities.</li>
+          <li>🧠 It can even guess what operating system a device is running.</li>
+        </ul>
+
+        <!-- Nmap Flag image -->
+        <img src="../images/Anthem/Nmap_Flag.png" 
+             alt="Nmap Flag Used" 
+             style="max-width:100%; border:1px solid #ccc; padding:5px;">
+        <ul>
+          <li><code>-A</code> → Enable OS Detection, Version Detection, Script scanning, and traceroute</li>
+          <li><code>-Pn</code> → Treat all hosts as online (skip host discovery)</li>
+          <li><code>-T4</code> → Use faster timing for quicker scans</li>
+          <li><code>-oN</code> → Save output to a normal-format file</li>
+        </ul>
+
+        <!-- Nmap scan image -->
+        <img src="../images/Anthem/Nmap_Scan.png" 
+             alt="Nmap scan results showing open ports 80 (HTTP) and 3389 (RDP)" 
+             style="max-width:100%; border:1px solid #ccc; padding:5px;">
+
+        <p>From the scan, we identified:</p>
+        <ul>
+          <li>Port 80: HTTP (Web Server). This is likely a webpage.</li>
+          <li>Port 3389: RDP (Remote Desktop Protocol), something we will likely use to gain access later since no SSH was identified on the target machine.</li>
+        </ul>
+
+        <p>🖥️ RDP (Remote Desktop Protocol) is a way to control another computer from far away, as if you were sitting right in front of it.</p>
+        <p>🌐 HTTP (HyperText Transfer Protocol) is the language your browser uses to talk to websites.</p>
+
+        <h4>Key Questions</h4>
+
+        <ul>
+          <li><strong>What port is for the web server?</strong> → Port 80 (HTTP).</li>
+          <li><strong>What port is for remote desktop service?</strong> → Port 3389 (RDP).</li>
+          <li><strong>What is a possible password in one of the pages web crawlers check for?</strong> We have to come back to this later since the answer can’t be found right at the start — we have to do some digging first.</li>
+        </ul>
+
+        <p><strong>Robots.txt</strong> is usually the most common text file that web crawlers are excluded from searching. Most of the time, running <strong>Gobuster, Dirbuster, or Dirsearch</strong> will display that text file, but this time we didn’t have any luck.</p>
+
+        <h4 style="margin-bottom:0;">🤖 What is the robots.txt?</h4>
+        <p style="margin-top:0;"><strong>robots.txt</strong> is a text file placed at the root of a website (like example.com/robots.txt) that tells web crawlers (like Googlebot or Bingbot) what they’re allowed to access and what to avoid.</p>
+
+        <p>I tried <strong>Feroxbuster</strong>, but I didn’t have any luck discovering <strong>robots.txt</strong>, so I skipped this one and moved on.</p>
+
+        <!-- Feroxbuster Flag image -->
+        <img src="../images/Anthem/Feroxbuster_Flag.png" alt="Feroxbuster Flag" style="max-width:100%; border:1px solid #ccc; padding:5px;">
+        <ul>
+          <li><strong>-u</strong> → URL or Target to scan</li>
+          <li><strong>-w</strong> → Wordlist to use for directory/file discovery</li>
+          <li><strong>-s</strong> → Only display results with specific HTTP status codes (skips everything else)</li>
+          <li><strong>-o</strong> → Save output to a normal-format file</li>
+        </ul>
+
+        <!-- Feroxbuster scan image -->
+        <img src="../images/Anthem/Feroxbuster.png" 
+             alt="Feroxbuster scan" 
+             style="max-width:100%; border:1px solid #ccc; padding:5px;">
+
+        <p>As you can see, I did not discover <strong>/robots.txt</strong>. Not sure if it was because I used the wrong wordlist, but I didn’t have any luck with this attempt. I could have tried <strong>Gobuster</strong>, but I wanted to experiment with something new.</p>
+
+        <h3>What CMS is the Website using?</h3>
+
+        <p>For CMS detection, I first tried <strong>WhatWeb</strong> but didn’t get a result.</p>
+        <p><strong>WhatWeb</strong> is a tool that helps you figure out what technologies a website is using — kind of like digital detective work. It can detect things like:</p>
+
+        <ul style="list-style-type: disc; color: white; padding-left: 20px;">
+          <li>🧱 The CMS (like WordPress, Joomla).</li>
+          <li>🖥️ Web server type (Apache, Nginx).</li>
+          <li>💻 Programming languages (PHP, ASP.NET).</li>
+          <li>🛡️ Tracking tools or security plugins.</li>
+        </ul>
+
+        <!-- WhatWeb scan image -->
+        <img src="../images/Anthem/whatweb.png" 
+             alt="WhatWeb scan" 
+             style="max-width:100%; border:1px solid #ccc; padding:5px;">
+
+        <p>Then I tried <strong>wig</strong>, which you can install with <code>apt-get install wig</code>.</p>
+        <p><strong>wig</strong> is a tool that helps you identify what software and technologies a website is running, especially web applications and frameworks:</p>
+
+        <ul style="list-style-type: disc; color: white; padding-left: 20px;">
+          <li>🔍 It scans a website and tries to guess the software stack behind it.</li>
+          <li>🧱 It’s especially good at spotting CMSs, JavaScript libraries, and server-side frameworks.</li>
+          <li>⚠️ It also tries to find vulnerabilities by checking version numbers.</li>
+        </ul>
+
+        <!-- wig flag image -->
+        <img src="../images/Anthem/wig_flag.png" 
+             alt="wig flag" 
+             style="max-width:100%; border:1px solid #ccc; padding:5px;">
+
+        <!-- wig scan image -->
+        <img src="../images/Anthem/wig_Scan.png" alt="wig scan" style="max-width:100%; border:1px solid #ccc; padding:5px;">
+
+        <p>After reviewing the results, we can clearly see two interesting findings: the <strong>CMS</strong> in use and the <strong>robots.txt</strong> file that Feroxbuster had missed earlier.</p>
+        <p><strong>Umbraco</strong> is the answer to the CMS question.</p>
+
+        <p>Now we can go back and answer the question <strong>“What is a possible password in one of the pages…”</strong>. First we have to visit that <strong>robots.txt</strong> page and check it there.</p>
+
+        <!-- Robots.txt -->
+        <img src="../images/Anthem/Robots.png" 
+             alt="Content of Robots.txt" 
+             style="max-width:100%; border:1px solid #ccc; padding:5px;">
+
+        <p>We can also see <strong>UmbracoIsTheBest!</strong> which may be the possible password mentioned. If it looked like a password, it must be a password.</p>
+      </article>
+    </section>
+
+    <!-- Task 2 -->
+    <section>
+      <article>
+        <h3>What is the Domain of the Website?</h3>
+        <p>This can be found directly on the site. It appears both in the main content and in the footer. 
+          Some people like to add the domain to <strong>/etc/hosts</strong> for convenience, but that’s optional.</p>
+        <img src="../images/Anthem/Domain.png" 
+             alt="Anthem Website Page showing the domain" 
+             style="max-width:100%; border:1px solid #ccc; padding:5px;">
+      </article>
+    </section>
+
+    <!-- Task 3 -->
+    <section>
+      <article>
+        <h3>What’s the Name of the Administrator?</h3>
+
+        <p>The blog hides clues about the administrator. By digging through pages and metadata, you can spot hints of the admin’s name — they never make it obvious. For instance, a poem can be found on the IT Department page, revealing a subtle connection.</p>
+
+        <img src="../images/Anthem/IT_Department_Page_SG.png" 
+             alt="Poem Page revealing administrator’s email address" 
+             style="max-width:100%; border:1px solid #ccc; padding:5px;">
+
+        <p>If we do a simple Google search on the poem, we can find the admin’s name is <strong>Solomon Grundy</strong>, which is in fact our answer to the question above.</p>
+
+        <img src="../images/Anthem/SG_Poem.png" 
+             alt="Poem Page revealing administrator’s email address" 
+             style="max-width:100%; border:1px solid #ccc; padding:5px;">
+      </article>
+
+      <article>
+        <h3>Can We Find the Email Address of the Administrator?</h3>
+        <p>Since This room focuses on enumeration, so the answer is likely in one of the pages. If we looked at the <strong>We Are Hiring</strong> page— we will find an email and we can follow that same format for our answer.</p>
+
+        <img src="../images/Anthem/Email.png" 
+             alt="Poem Page" 
+             style="max-width:100%; border:1px solid #ccc; padding:5px;">
+      </article>
+    </section>
+
+
+
+ <section>
+  <h2>Task 2 – Spot The Flags</h2>
+  <article>
+
+    <h3 style="margin-bottom:0;">Enumeration</h3>
+    <p style="margin-top:0;">
+      <strong>Enumeration</strong> is the active phase of information gathering where an attacker or penetration tester interacts directly with a target system to extract structured, detailed data. Unlike passive reconnaissance (which observes without touching), enumeration involves sending requests and analyzing responses to uncover.
+    </p>
+
+    <p>
+      This section focuses on enumeration — thoroughly exploring every corner of the website. Developing this skill is valuable not just for CTFs but also for penetration testing, where leaving no stone unturned is essential. Many of these clues are hidden within the webpage’s source code.
+    </p>
+
+    <h3>What is Flag 1?</h3>
+    <p>The first flag can be found on the <strong>We Are Hiring</strong> page.</p>
+    <img src="../images/Anthem/Flag1.png" 
+         alt="Flag 1 found on We Are Hiring page" 
+         style="max-width:100%; border:1px solid #ccc; padding:5px;">
+
+    <h3>What is Flag 2?</h3>
+    <p>The second flag can be found on the <strong>Main Page</strong>.</p>
+    <img src="../images/Anthem/Anthem_Main_Page_Flag_2.png" 
+         alt="Flag 2 found on Main Page" 
+         style="max-width:100%; border:1px solid #ccc; padding:5px;">
+
+    <h3>What is Flag 3?</h3>
+    <p>The third flag can be found on the <strong>Authors Page</strong>.</p>
+    <img src="../images/Anthem/Flags3.png" 
+         alt="Flag 3 found on Authors Page" 
+         style="max-width:100%; border:1px solid #ccc; padding:5px;">
+
+    <h3>What is Flag 4?</h3>
+    <p>The fourth flag can be found on the <strong>IT Blog Page</strong>.</p>
+    <img src="../images/Anthem/Flag4.png" 
+         alt="Flag 4 found on IT Blog Page" 
+         style="max-width:100%; border:1px solid #ccc; padding:5px;">
+
+  </article>
+</section>
+
+<section>
+  <h2>Task 3 – Final Stage</h2>
+  <article>
+
+    <h3 style="margin-bottom:0;">Privilege Escalation</h3>
+    <p style="margin-top:0;"><strong>Privilege Escalation</strong> is the process by which an attacker or penetration tester gains higher-level permissions on a system than they initially had. It’s a critical step in post-exploitation, allowing access to sensitive data, system configurations, or control over other users and processes.</p>
+
+    <p>1 - The final stage is gaining root access on the machine, which involves escalating our privileges to gain full control.</p>
+    
+    <h3>Let's figure out the username and password to log in to the box. (The box is not on a domain)</h3>
+
+    <p>This one is easy—we should already know this information based on everything we've gathered.</p>
+    <p>The <strong>username</strong> and <strong>password</strong> we found: → <strong>SG:UmbracoIsTheBest!</strong></p> 
+    <p>I tried using <strong>xFreerdp</strong>, but it didn’t work for me, so I fell back to <strong>Remmina</strong>, which is an alternative to <strong>xFreerdp</strong>.</p>
+
+    <!-- RDP -->
+    <img src="../images/Anthem/Rdp_remmina.png" 
+         alt="Remmina" 
+         style="max-width:100%; border:1px solid #ccc; padding:5px;">
+
+    <h3>2 - Gain initial access to the machine. What is the content of user.txt?</h3>
+    <p>This one was pretty easy—logging into the machine was all it took to get the <strong>user.txt</strong> flag.</p>
+
+    <!-- User Flag -->
+    <img src="../images/Anthem/Rdp.png" 
+         alt="User Flag" 
+         style="max-width:100%; border:1px solid #ccc; padding:5px;">
+
+    <h3>3 - Can we spot the admin password?</h3>
+    <p>The best place to look is in the <strong>Administrator</strong> home directory, but trying to access it results in access denied. I didn’t even try it because I knew I would get denied. So I looked around the machine to see if anything stood out. After some digging, I discovered a hidden file that seemed out of place.</p>
+
+    <!-- Hidden file -->
+    <img src="../images/Anthem/hidden.png" 
+         alt="Hidden file" 
+         style="max-width:100%; border:1px solid #ccc; padding:5px;">
+
+    <p>Here we can see a <strong>backup</strong> file that was hidden. So moving forward, I switched from the command prompt to the GUI.</p>
+    <p>Trying to access the backup file initially resulted in access denied. Using the GUI, I enabled hidden files to be visible and worked our magic.</p>
+
+    <!-- Access denied -->
+    <img src="../images/Anthem/backup_denied.png" 
+         alt="Access denied" 
+         style="max-width:100%; border:1px solid #ccc; padding:5px;">
+    <!-- Show hidden -->
+    <img src="../images/Anthem/show_hidden.png" 
+         alt="Show hidden files" 
+         style="max-width:100%; border:1px solid #ccc; padding:5px;">
+
+    <p>We started by adding the user <strong>SG</strong> and granting full access to the file.</p>
+
+    <!-- Add user -->
+    <img src="../images/Anthem/add_user.png" 
+         alt="Add user" 
+         style="max-width:100%; border:1px solid #ccc; padding:5px;">
+
+    <!-- Grant access -->
+    <img src="../images/Anthem/full.png" 
+         alt="Grant full access" 
+         style="max-width:100%; border:1px solid #ccc; padding:5px;">
+
+    <p>After all of that was done, we could now give the restore file inside the backup folder another shot—and voilà! We were able to view its contents.</p>
+
+    <!-- Content -->
+    <img src="../images/Anthem/content.png" 
+         alt="Backup file content" 
+         style="max-width:100%; border:1px solid #ccc; padding:5px;">
+
+    <h3>Escalate your privileges to root. What is the content of root.txt?</h3>
+    <p>Now we move to the final step—using the password we just discovered to log back into the machine as the <strong>Administrator</strong> and retrieve the root flag.</p>
+    <p>To do so, we simply log out of our current RDP session and log back in using the newly discovered credentials. After doing so, we can locate the <strong>root.txt</strong> flag in the <strong>Administrator</strong> home directory.</p>
+
+    <!-- Root flag -->
+    <img src="../images/Anthem/rootFlag.png" 
+         alt="Root flag" 
+         style="max-width:100%; border:1px solid #ccc; padding:5px;">
+
+  </article>
+</section>
+
+
+
+    <!-- Summary -->
+    <section>
+      <h2>Summary</h2>
+
+      <p>Anthem serves as an accessible introduction for individuals new to capture the flag (CTF) competitions, emphasizing the importance of comprehensive enumeration. Each challenge is designed to reinforce essential skills for CTFs and penetration testing, particularly the necessity of thorough exploration. Clues are strategically distributed throughout the website, and certain solutions require the application of open-source intelligence (OSINT) techniques, such as identifying the administrator username. This combination of complex puzzles and investigative methods enhances the learning experience and provides a distinctive alternative to standard vulnerability assessments.</p>
+
+      <p>The box also highlights a crucial lesson in file permissions and data security. Simply hiding files is not sufficient to protect sensitive information. Users should never have the ability to alter permissions on critical files. Sensitive data, especially administrator credentials, should never be stored in easily accessible documents. At the very least, such files should be password-protected or encrypted, and ideally, sensitive passwords should be memorized or managed securely. This practical example reinforces the importance of following proper security practices in real-world scenarios.</p>
+
+      <p>In summary, Anthem provides an effective introduction to enumeration and open-source intelligence (OSINT), while also emphasizing foundational security concepts such as file permissions and data protection. This analysis aims to clarify the key strategies required to address the challenges presented, thereby equipping beginners with the necessary skills and confidence to approach similar tasks in the future.</p>
+
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2025 CyberGeek92 | Walkthrough for learning purposes</p>
+  </footer>
+</body>
+</html>
