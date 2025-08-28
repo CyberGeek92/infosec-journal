@@ -4,14 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Anthem | TryHackMe Walkthrough</title>
-  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="../../style.css">
 </head>
 <body>
   <header>
     <h1>Anthem | TryHackMe Walkthrough</h1>
     <nav>
-      <a href="../index.html">Home</a>
-      <a href="../writeups/index.html">Write-Ups</a>
+      <a href="../../index.html">Home</a>
+      <a href="../index.html">Write-Ups</a>
     </nav>
   </header>
 
@@ -20,7 +20,7 @@
     <section>
       <h2>Overview</h2>
 
-        <img src="../images/Anthem/Anthem_Title.png" 
+        <img src="../../images/Anthem/Anthem_Title.png" 
              alt="Anthem Page showing Administrator name" 
              style="display: block; margin: center; max-width:100%; border:1px solid #ccc; padding:5px;">
 
@@ -51,7 +51,7 @@
         </ul>
 
         <!-- Nmap Flag image -->
-        <img src="../images/Anthem/Nmap_Flag.png" 
+        <img src="../../images/Anthem/Nmap_Flag.png" 
              alt="Nmap Flag Used" 
              style="max-width:100%; border:1px solid #ccc; padding:5px;">
         <ul>
@@ -62,7 +62,7 @@
         </ul>
 
         <!-- Nmap scan image -->
-        <img src="../images/Anthem/Nmap_Scan.png" 
+        <img src="../../images/Anthem/Nmap_Scan.png" 
              alt="Nmap scan results showing open ports 80 (HTTP) and 3389 (RDP)" 
              style="max-width:100%; border:1px solid #ccc; padding:5px;">
 
@@ -91,7 +91,7 @@
         <p>I tried <strong>Feroxbuster</strong>, but I didn’t have any luck discovering <strong>robots.txt</strong>, so I skipped this one and moved on.</p>
 
         <!-- Feroxbuster Flag image -->
-        <img src="../images/Anthem/Feroxbuster_Flag.png" alt="Feroxbuster Flag" style="max-width:100%; border:1px solid #ccc; padding:5px;">
+        <img src="../../images/Anthem/Feroxbuster_Flag.png" alt="Feroxbuster Flag" style="max-width:100%; border:1px solid #ccc; padding:5px;">
         <ul>
           <li><strong>-u</strong> → URL or Target to scan</li>
           <li><strong>-w</strong> → Wordlist to use for directory/file discovery</li>
@@ -100,7 +100,7 @@
         </ul>
 
         <!-- Feroxbuster scan image -->
-        <img src="../images/Anthem/Feroxbuster.png" 
+        <img src="../../images/Anthem/Feroxbuster.png" 
              alt="Feroxbuster scan" 
              style="max-width:100%; border:1px solid #ccc; padding:5px;">
 
@@ -119,7 +119,7 @@
         </ul>
 
         <!-- WhatWeb scan image -->
-        <img src="../images/Anthem/whatweb.png" 
+        <img src="../../images/Anthem/whatweb.png" 
              alt="WhatWeb scan" 
              style="max-width:100%; border:1px solid #ccc; padding:5px;">
 
@@ -133,12 +133,12 @@
         </ul>
 
         <!-- wig flag image -->
-        <img src="../images/Anthem/wig_flag.png" 
+        <img src="../../images/Anthem/wig_flag.png" 
              alt="wig flag" 
              style="max-width:100%; border:1px solid #ccc; padding:5px;">
 
         <!-- wig scan image -->
-        <img src="../images/Anthem/wig_Scan.png" alt="wig scan" style="max-width:100%; border:1px solid #ccc; padding:5px;">
+        <img src="../../images/Anthem/wig_Scan.png" alt="wig scan" style="max-width:100%; border:1px solid #ccc; padding:5px;">
 
         <p>After reviewing the results, we can clearly see two interesting findings: the <strong>CMS</strong> in use and the <strong>robots.txt</strong> file that Feroxbuster had missed earlier.</p>
         <p><strong>Umbraco</strong> is the answer to the CMS question.</p>
@@ -146,7 +146,7 @@
         <p>Now we can go back and answer the question <strong>“What is a possible password in one of the pages…”</strong>. First we have to visit that <strong>robots.txt</strong> page and check it there.</p>
 
         <!-- Robots.txt -->
-        <img src="../images/Anthem/Robots.png" 
+        <img src="../../images/Anthem/Robots.png" 
              alt="Content of Robots.txt" 
              style="max-width:100%; border:1px solid #ccc; padding:5px;">
 
@@ -160,7 +160,7 @@
         <h3>What is the Domain of the Website?</h3>
         <p>This can be found directly on the site. It appears both in the main content and in the footer. 
           Some people like to add the domain to <strong>/etc/hosts</strong> for convenience, but that’s optional.</p>
-        <img src="../images/Anthem/Domain.png" 
+        <img src="../../images/Anthem/Domain.png" 
              alt="Anthem Website Page showing the domain" 
              style="max-width:100%; border:1px solid #ccc; padding:5px;">
       </article>
@@ -173,13 +173,13 @@
 
         <p>The blog hides clues about the administrator. By digging through pages and metadata, you can spot hints of the admin’s name — they never make it obvious. For instance, a poem can be found on the IT Department page, revealing a subtle connection.</p>
 
-        <img src="../images/Anthem/IT_Department_Page_SG.png" 
+        <img src="../../images/Anthem/IT_Department_Page_SG.png" 
              alt="Poem Page revealing administrator’s email address" 
              style="max-width:100%; border:1px solid #ccc; padding:5px;">
 
         <p>If we do a simple Google search on the poem, we can find the admin’s name is <strong>Solomon Grundy</strong>, which is in fact our answer to the question above.</p>
 
-        <img src="../images/Anthem/SG_Poem.png" 
+        <img src="../../images/Anthem/SG_Poem.png" 
              alt="Poem Page revealing administrator’s email address" 
              style="max-width:100%; border:1px solid #ccc; padding:5px;">
       </article>
@@ -188,7 +188,7 @@
         <h3>Can We Find the Email Address of the Administrator?</h3>
         <p>Since This room focuses on enumeration, so the answer is likely in one of the pages. If we looked at the <strong>We Are Hiring</strong> page— we will find an email and we can follow that same format for our answer.</p>
 
-        <img src="../images/Anthem/Email.png" 
+        <img src="../../images/Anthem/Email.png" 
              alt="Poem Page" 
              style="max-width:100%; border:1px solid #ccc; padding:5px;">
       </article>
@@ -211,25 +211,25 @@
 
     <h3>What is Flag 1?</h3>
     <p>The first flag can be found on the <strong>We Are Hiring</strong> page.</p>
-    <img src="../images/Anthem/Flag1.png" 
+    <img src="../../images/Anthem/Flag1.png" 
          alt="Flag 1 found on We Are Hiring page" 
          style="max-width:100%; border:1px solid #ccc; padding:5px;">
 
     <h3>What is Flag 2?</h3>
     <p>The second flag can be found on the <strong>Main Page</strong>.</p>
-    <img src="../images/Anthem/Anthem_Main_Page_Flag_2.png" 
+    <img src="../../images/Anthem/Anthem_Main_Page_Flag_2.png" 
          alt="Flag 2 found on Main Page" 
          style="max-width:100%; border:1px solid #ccc; padding:5px;">
 
     <h3>What is Flag 3?</h3>
     <p>The third flag can be found on the <strong>Authors Page</strong>.</p>
-    <img src="../images/Anthem/Flags3.png" 
+    <img src="../../images/Anthem/Flags3.png" 
          alt="Flag 3 found on Authors Page" 
          style="max-width:100%; border:1px solid #ccc; padding:5px;">
 
     <h3>What is Flag 4?</h3>
     <p>The fourth flag can be found on the <strong>IT Blog Page</strong>.</p>
-    <img src="../images/Anthem/Flag4.png" 
+    <img src="../../images/Anthem/Flag4.png" 
          alt="Flag 4 found on IT Blog Page" 
          style="max-width:100%; border:1px solid #ccc; padding:5px;">
 
@@ -252,7 +252,7 @@
     <p>I tried using <strong>xFreerdp</strong>, but it didn’t work for me, so I fell back to <strong>Remmina</strong>, which is an alternative to <strong>xFreerdp</strong>.</p>
 
     <!-- RDP -->
-    <img src="../images/Anthem/Rdp_remmina.png" 
+    <img src="../../images/Anthem/Rdp_remmina.png" 
          alt="Remmina" 
          style="max-width:100%; border:1px solid #ccc; padding:5px;">
 
@@ -260,7 +260,7 @@
     <p>This one was pretty easy—logging into the machine was all it took to get the <strong>user.txt</strong> flag.</p>
 
     <!-- User Flag -->
-    <img src="../images/Anthem/Rdp.png" 
+    <img src="../../images/Anthem/Rdp.png" 
          alt="User Flag" 
          style="max-width:100%; border:1px solid #ccc; padding:5px;">
 
@@ -268,7 +268,7 @@
     <p>The best place to look is in the <strong>Administrator</strong> home directory, but trying to access it results in access denied. I didn’t even try it because I knew I would get denied. So I looked around the machine to see if anything stood out. After some digging, I discovered a hidden file that seemed out of place.</p>
 
     <!-- Hidden file -->
-    <img src="../images/Anthem/hidden.png" 
+    <img src="../../images/Anthem/hidden.png" 
          alt="Hidden file" 
          style="max-width:100%; border:1px solid #ccc; padding:5px;">
 
@@ -276,30 +276,30 @@
     <p>Trying to access the backup file initially resulted in access denied. Using the GUI, I enabled hidden files to be visible and worked our magic.</p>
 
     <!-- Access denied -->
-    <img src="../images/Anthem/backup_denied.png" 
+    <img src="../../images/Anthem/backup_denied.png" 
          alt="Access denied" 
          style="max-width:100%; border:1px solid #ccc; padding:5px;">
     <!-- Show hidden -->
-    <img src="../images/Anthem/show_hidden.png" 
+    <img src="../../images/Anthem/show_hidden.png" 
          alt="Show hidden files" 
          style="max-width:100%; border:1px solid #ccc; padding:5px;">
 
     <p>We started by adding the user <strong>SG</strong> and granting full access to the file.</p>
 
     <!-- Add user -->
-    <img src="../images/Anthem/add_user.png" 
+    <img src="../../images/Anthem/add_user.png" 
          alt="Add user" 
          style="max-width:100%; border:1px solid #ccc; padding:5px;">
 
     <!-- Grant access -->
-    <img src="../images/Anthem/full.png" 
+    <img src="../../images/Anthem/full.png" 
          alt="Grant full access" 
          style="max-width:100%; border:1px solid #ccc; padding:5px;">
 
     <p>After all of that was done, we could now give the restore file inside the backup folder another shot—and voilà! We were able to view its contents.</p>
 
     <!-- Content -->
-    <img src="../images/Anthem/content.png" 
+    <img src="../../images/Anthem/content.png" 
          alt="Backup file content" 
          style="max-width:100%; border:1px solid #ccc; padding:5px;">
 
@@ -308,7 +308,7 @@
     <p>To do so, we simply log out of our current RDP session and log back in using the newly discovered credentials. After doing so, we can locate the <strong>root.txt</strong> flag in the <strong>Administrator</strong> home directory.</p>
 
     <!-- Root flag -->
-    <img src="../images/Anthem/rootFlag.png" 
+    <img src="../../images/Anthem/rootFlag.png" 
          alt="Root flag" 
          style="max-width:100%; border:1px solid #ccc; padding:5px;">
 

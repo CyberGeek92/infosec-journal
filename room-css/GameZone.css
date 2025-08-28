@@ -1,0 +1,119 @@
+/* Base Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Body Styling */
+body {
+  font-family: 'Courier New', Courier, monospace;
+  background-color: #0b0b0b; /* Deep black */
+  color: #e53935;            /* Blood red */
+  line-height: 1.6;
+  padding: 2rem;
+  cursor: crosshair;         /* 🎯 Crosshair cursor */
+}
+
+/* Header Styling */
+header {
+  text-align: center;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid #e53935;
+  padding-bottom: 1rem;
+}
+
+header h1 {
+  font-size: 2.5rem;
+  color: #ff1744;
+}
+
+header p {
+  font-size: 1rem;
+  color: #b71c1c;
+}
+
+/* Section Styling */
+section {
+  margin-bottom: 3rem;
+  padding: 1rem;
+  border: 1px solid #e53935;
+  background-color: #121212;
+  border-radius: 8px;
+}
+
+section h2 {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  color: #ff5252;
+  border-bottom: 1px dashed #e53935;
+  padding-bottom: 0.5rem;
+}
+
+/* Article Blocks */
+article {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background-color: #1c1c1c;
+  border-left: 4px solid #e53935;
+  box-shadow: 0 0 10px rgba(229, 57, 53, 0.2);
+}
+
+article h3 {
+  font-size: 1.2rem;
+  color: #f44336;
+}
+
+article p {
+  font-size: 0.95rem;
+  color: #eeeeee;
+}
+
+/* Image Styling */
+img {
+  width: 900px;
+  height: auto;
+  margin: 1rem 0;
+  border: 2px solid #e53935;
+  border-radius: 4px;
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  font-size: 0.8rem;
+  color: #757575;
+  margin-top: 4rem;
+  border-top: 1px solid #e53935;
+  padding-top: 1rem;
+}
+
+/* 🩸 Blood Drop List Styling */
+ul {
+  list-style-type: none;     /* Removes default bullet */
+  padding-left: 0;           /* Aligns blood drop flush left */
+}
+
+ul li::before {
+  content: "🩸";
+  color: #e53935;
+  font-size: 1.1rem;
+  margin-right: 0.4rem;
+  animation: pulse 1.5s infinite;
+}
+
+/* Optional: Targeted Blood Drop List */
+.blood-list li::before {
+  content: "🩸";
+  color: #e53935;
+  font-size: 1.1rem;
+  margin-right: 0.4rem;
+  animation: pulse 1.5s infinite;
+}
+
+/* 🫀 Pulse Animation */
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.6; }
+  100% { transform: scale(1); opacity: 1; }
+}

@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game Zone | TryHackMe Walkthrough</title>
+  <link rel="icon" type="image/x-icon" href="../../images/gamezone/crossair.ico" />
+  <link rel="stylesheet" href="../../room-css/GameZone.css" />
+</head>
+<body>
+  <header>
+    <h1>Game Zone | TryHackMe Walkthrough</h1>
+    <nav>
+      <a href="../../index.html">Home</a>
+      <a href="../index.html">Write-Ups</a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Banner -->
+    <section>
+      <img src="../../images/gamezone/gamezone_banner.png" 
+           alt="Game Zone walkthrough banner" 
+           style="display: block; margin: 0 auto; max-width:100%; border:1px solid #ccc; padding:5px;">
+    </section>
+
+    <!-- Task Menu -->
+    <nav id="task-menu">
+      <ul>
+        <li><a href="#task1">Task 1 - Deploy the Vulnerable Machine</a></li>
+        <li><a href="#task2">Task 2 - Obtain Access via SQLi</a></li>
+        <li><a href="#task3">Task 3 - Using SQLMap</a></li>
+        <li><a href="#task4">Task 4 - Cracking a Password with John the Ripper</a></li>
+        <li><a href="#task5">Task 5 - Exposing Services with Reverse SSH Tunnels</a></li>
+        <li><a href="#task6">Task 6 - Privilege Escalation with Metasploit</a></li>
+      </ul>
+    </nav>
+
+    <!-- Room Summary Section -->
+    <section id="room-summary">
+      <h2>🕹️ Game Zone — Walkthrough Summary</h2>
+      <p>🧩 <strong>Difficulty:</strong> Easy</p> 
+      <p>🖥️ <strong>Platform:</strong> Linux</p>
+      <p>🎯 <strong>Focus Areas:</strong> Web exploitation, enumeration, privilege escalation</p>
+
+      <h2>Overview</h2>
+      <p>
+        Game Zone is a beginner-friendly TryHackMe room that guides users through a realistic attack chain on a Linux-based server. The challenge begins with a vulnerable web application, where manual SQL injection is used to extract credentials from the backend database. After cracking the password, SSH access is gained, leading to deeper enumeration and the discovery of a locally hosted CMS hidden behind a firewall. Using SSH port forwarding, the CMS is exposed and exploited for privilege escalation.
+      </p>
+    </section>
+
+    <!-- Task 1 Section -->
+    <section id="task1">
+      <h2>Task 1 - Deploy the Vulnerable Machine</h2>
+      <h3>Deploy the machine and access its web server</h3>
+
+      <img src="../../images/gamezone/nmapScan.png" 
+           alt="Nmap scan results showing open ports 22 and 80" 
+           style="max-width:100%; border:1px solid #ccc; padding:5px;">
+
+      <article>
+        <ul>
+          <li><code>-A</code> → Enables OS detection, version detection, script scanning, and traceroute</li>
+          <li><code>-Pn</code> → Treats all hosts as online (skips host discovery)</li>
+          <li><code>-T4</code> → Uses faster timing for quicker scans</li>
+          <li><code>-oN</code> → Saves output to a normal-format file</li>
+        </ul>
+        <p>From the scan, we can see that two ports are open: <strong>SSH (22)</strong> and <strong>HTTP (80)</strong>.</p>
+        <p><strong>SSH</strong> is used for secure remote access to the server.</p>
+        <p><strong>HTTP</strong> serves the web application we’ll exploit for initial access.</p>
+        <p>After accessing the web server, we’re greeted by a forum-style page.</p>
+      </article>
+
+      <img src="../../images/gamezone/gamezonewebpage.png" 
+           alt="Game Zone forum page with cartoon sniper avatar" 
+           style="max-width:100%; border:1px solid #ccc; padding:5px;">
+
+      <article>
+        <p>
+          After logging in, we arrive at the <strong>Game Zone Portal</strong>, where users can search for game reviews.  
+          If we inspect the URL, we notice the page redirects to <strong>gameedite.php</strong>,  
+          which hints at a potential vulnerability in how the site handles input.
+        </p>
+      </article>
+
+      <h3>What is the name of the large cartoon avatar holding a sniper on the forum?</h3>
+    
+      <article>
+        <p>
+          Because I’ve played a lot of video games, I recognized the character immediately.  
+          But if you’re not familiar with the image, a quick <strong>Google</strong> search for <strong>Hitman</strong> reveals the name: <strong>Agent 47</strong>.
+        </p>
+      </article>
+
+      <img src="../../images/gamezone/agent47.png" 
+           alt="Agent 47 from Hitman series identified via Google search" 
+           style="max-width:100%; border:1px solid #ccc; padding:5px;">
+    
+      <article>
+        <p>So, the answer to the question above is <strong>Agent 47</strong>.</p>
+      </article>
+    </section>
+
+    <!-- Task 2 Section -->
+    <section id="task2">
+      <h2>Task 2 - Obtain Access via SQLi</h2>
+      <h3>When you've logged in, what page do you get redirected to?</h3>
+
+      <p style="text-align: center;">*** Before we dive in and answer the question above, let’s explore what SQL is, what it's used for, and how SQL injection works. ***</p>
+      
+      <article>
+        <p><strong>What is SQL?</strong><br>
+        SQL (Structured Query Language) is the standard language used to interact with databases. It allows you to store, retrieve, and manipulate data—like checking login credentials or pulling user profiles.</p>
+
+        <p><strong>What is SQL Injection?</strong><br>
+        SQL injection is a technique used to exploit insecure database queries by injecting malicious SQL code into input fields. If the application doesn’t sanitize user input, attackers can bypass authentication or access sensitive data by manipulating the query logic.</p>
+
+        <p>When we first accessed the Game Zone page, we saw a login form. That same form is vulnerable to SQL injection, and we’ll use it to craft a query that gives us access without valid credentials.</p>
+      </article>
+
+      <img src="../../images/gamezone/sqlinjection.png" 
+           alt="SQL injection payload used on login form" 
+           style="max-width:100%; border:1px solid #ccc; padding:5px;">
+
+      <article>
+        <p>We’ll be using this payload: <strong>' or 1=1 -- -</strong> to gain access to the <strong>Game Zone</strong> page.</p>
+        <h3>💉 SQL Injection Payload Breakdown</h3>
+        <ul>
+          <li><strong>`'`</strong> — Closes the original string in the SQL query.</li>
+          <li><strong>`or 1=1`</strong> — Forces the condition to always be true, bypassing authentication.</li>
+          <li><strong>`--`</strong> — Starts a comment, ignoring the rest of the query.</li>
+          <li><strong>`-`</strong> — Often added to cleanly terminate the comment (optional but common).</li>
+        </ul>
+      </article>
+
+      <img src="../../images/gamezone/pagedirectedto.png" 
+           alt="Redirected Game Zone page after login" 
+           style="max-width:100%; border:1px solid #ccc; padding:5px;">
+
+      <article>
+        <p>This payload tricks the server into executing a query that always evaluates to true, allowing login without valid credentials.</p>
+        <p>After gaining access, we’re redirected to <strong>portal.php</strong>.</p>
+      </article>
+    </section>
+
+    <!-- Task 3 Section -->
+    <section id="task3">
+      <h2>Task 3 - Using SQLMap</h2>
+
+      <article>
+        <p>
+          In this section, we’ll use SQLMap to dump the database of <strong>Game Zone</strong>. But first, what is SQLMap and what is it used for?
+        </p>
+        <p>
+          🛠️ SQLMap is an open-source penetration testing tool designed to automate the process of detecting and exploiting <strong>SQL injection vulnerabilities</strong> in web applications.
+        </p>
+
+
+    <p>
+          We’ll target the game review search feature we accessed earlier. First, we need to intercept a request made to the search function using BurpSuite.
+        </p>
+      </article>
+
+      <article>
+        <img src="../../images/gamezone/burpsuite_post_request.png" 
+             alt="BurpSuite POST request intercepted for SQLMap analysis" 
+             style="max-width:100%; border:1px solid #ccc; padding:5px;">
+        <p>
+          After capturing the request, we save it to a file so SQLMap can analyze it and extract database information.
+        </p>
+        <img src="../../images/gamezone/postrequest_save.png" 
+             alt="Saving intercepted POST request for SQLMap" 
+             style="max-width:100%; border:1px solid #ccc; padding:5px;">
+      </article>
+
+      <article>
+        <p>We use the following command to dump the database:</p>
+        <p><em>sqlmap -r request.txt --dbms=mysql --dump</em></p>
+        <ul>
+          <li><strong>-r request.txt</strong> — Uses the saved HTTP request file</li>
+          <li><strong>--dbms=mysql</strong> — Specifies the backend database type</li>
+          <li><strong>--dump</strong> — Extracts and displays the contents of the database tables</li>
+        </ul>
+
+        <img src="../../images/gamezone/sqlmapscan.png" 
+             alt="SQLMap scan results showing dumped tables" 
+             style="max-width:100%; border:1px solid #ccc; padding:5px;">
+
+        <h3>In the users table, what is the hashed password?</h3>
+        <p>The hashed password is: <strong>ab5db915fc9cea6c78df88106c6500c57f2b52901ca6c0c6218f04122c3efd14</strong></p>
+
+        <img src="../../images/gamezone/tablesinfo.png" 
+             alt="Database tables showing usernames and hashes" 
+             style="max-width:100%; border:1px solid #ccc; padding:5px;">
+
+        <h3>What was the username associated with the hashed password?</h3>
+        <p>The username is: <strong>agent47</strong></p>
+
+        <h3>What was the other table name?</h3>
+        <p>Besides the <strong>users</strong> table, the other table is: <strong>post</strong></p>
+      </article>
+    </section>
+
+    <!-- Task 4 Section -->
+    <section id="task4">
+      <h2>Task 4 - Cracking a Password with John the Ripper</h2>
+
+      <article>
+        <p>
+          🕵️ John the Ripper (JTR) is a fast, free, and open-source tool used for cracking passwords. It comes pre-installed on Kali Linux.
+          In this task, we’ll use JTR to crack the hash we extracted earlier. While John the Ripper has been around for over 15 years, it remains a powerful tool alongside others like HashCat.
+        </p>
+        <p>
+          JTR works by taking a list of potential passwords (a wordlist), hashing each one using the same algorithm as the target hash, and comparing the results. Since hashes can’t be reversed, this comparison method is the only way to identify the original password.
+        </p>
+      </article>
+
+      <article>
+        <h3>What is the de-hashed password?</h3>
+        <img src="../../images/gamezone/hashpassword.png" 
+             alt="John the Ripper cracking output showing password" 
+             style="max-width:100%; border:1px solid #ccc; padding:5px;">
+        <p>We used John the Ripper to crack the hash we discovered earlier using the following command:</p>
+        <p><em>john hash.txt --wordlist=/usr/share/wordlists/rockyou.txt --format=RAW-SHA256</em></p>
+        <ul>
+          <li><strong>hash.txt</strong> — Contains the hash to be cracked</li>
+          <li><strong>--wordlist</strong> — Specifies the wordlist used for cracking</li>
+          <li><strong>--format</strong> — Indicates the hashing algorithm (SHA256 in this case)</li>
+        </ul>
+        <p>The cracked password is: <strong>videogamer124</strong></p>
+      </article>
+
+      <article>
+        <h3>What is the user flag?</h3>
+        <p>Now that we’ve pieced everything together, we can use SSH to remotely access the machine and retrieve our first flag.</p>
+        <p>Use the following command to SSH into the machine: <strong>ssh agent47@&lt;IP&gt;</strong> (Note: the IP address will vary for each user)</p>
+        <img src="../../images/gamezone/userflag.png" 
+             alt="User flag retrieved via SSH session" 
+             style="max-width:100%; border:1px solid #ccc; padding:5px;">
+        <p>The user flag is: <strong>649ac17b1480ac13ef1e4fa579dac95c</strong></p>
+      </article>
+    </section>
+
+
+
+<section id="task5">
+  <h2>Task 5 - Exposing Services with Reverse SSH Tunnels</h2>
+
+  <article>
+    <p>
+      Reverse SSH port forwarding allows you to expose a local service to a remote server. This means a port on the remote host is forwarded to a host and port on your local machine.
+    </p>
+    <p>
+      There are two types of SSH tunneling:
+    </p>
+    <ul>
+      <li><strong>-L (Local Forwarding):</strong> Redirects traffic from your local machine to a remote destination. Example: <code>ssh -L 9000:imgur.com:80 user@example.com</code> lets you access Imgur via <code>localhost:9000</code> even if it's blocked on your network.</li>
+      <li><strong>-R (Remote Forwarding):</strong> Exposes a local service to a remote server, allowing others to access it through your machine. It’s essentially the reverse of local forwarding.</li>
+    </ul>
+  </article>
+
+  <article>
+    <p>
+      To identify which services are listening on a host, we use the <code>ss</code> command:
+    </p>
+    <p><code>ss -tulpn</code></p>
+    <p>This command displays active socket connections with the following flags:</p>
+    <ul>
+      <li><strong>-t</strong> — Show TCP sockets</li>
+      <li><strong>-u</strong> — Show UDP sockets</li>
+      <li><strong>-l</strong> — Show only listening sockets</li>
+      <li><strong>-p</strong> — Show the process using each socket</li>
+      <li><strong>-n</strong> — Skip resolving service names (shows raw port numbers)</li>
+    </ul>
+  </article>
+
+  <h3>How many TCP sockets are running?</h3>
+
+  <article>
+    <img src="../../images/gamezone/socketConnection.png" 
+         alt="Diagram showing reverse SSH tunnel setup" 
+         style="max-width:100%; border:1px solid #ccc; padding:5px;">
+
+    <p>
+      Based on the picture above, we can see that only 5 TCP ports are open. The one we're interested in is <strong>10000</strong>.
+    </p>
+  </article>
+
+  <article>
+    <h3>What is the name of the exposed CMS?</h3>
+    <p>
+      The following command creates a secure tunnel from your local machine to the remote server:
+    </p>
+
+    <pre><code>ssh -L 10000:localhost:10000 &lt;username&gt;@&lt;ip&gt;</code></pre>
+
+    <p>
+      This command sets up a secure SSH tunnel from your local port <strong>10000</strong> to the remote machine’s port <strong>10000</strong>. It allows you to access a webserver running on the remote machine as if it were hosted locally. Once connected, open your browser and go to <strong>localhost:10000</strong> to interact with the service — without exposing it to the public internet.
+    </p>
+    <br>
+    <p>
+      After gaining access to the webserver on our local machine, we were able to discover the following information from the page:
+    </p>
+
+    <img src="../../images/gamezone/cmsinfo.png" 
+         alt="Screenshot showing CMS details" 
+         style="max-width:100%; border:1px solid #ccc; padding:5px;">
+
+    <p>The name of the exposed CMS is: <strong>Webmin</strong></p>
+    <br>
+
+    <h3>What is the CMS version?</h3>
+    <p>
+      From that same page, we also discovered the <strong>CMS Version</strong>, which is: <strong>1.580</strong>
+    </p>
+  </article>
+</section>
+
+<section id="task6"> 
+  <h2>Task 6 - Privilege Escalation with Metasploit</h2> 
+
+  <article>
+    <p>
+      For this section, we will be using <strong>Metasploit</strong> to escalate our privileges on the machine. Start Metasploit by running <code>msfconsole</code> in the terminal. Once the prompt appears, search for the CMS using its version number.
+    </p>
+  </article>
+
+  <img src="../../images/gamezone/searchwebmin1580.png" 
+       alt="Screenshot showing CMS search results" 
+       style="max-width:100%; border:1px solid #ccc; padding:5px;">
+
+  <article>       
+    <p>
+      As shown, we have two options. For this exercise, we’ll use option 0. Select it by typing <code>use 0</code> in the msfconsole terminal. Then run <code>show options</code> to view the required settings.
+    </p>
+  </article>
+
+  <img src="../../images/gamezone/showoptions.png" 
+       alt="Screenshot showing Metasploit module options" 
+       style="max-width:100%; border:1px solid #ccc; padding:5px;">
+  <br>
+  <img src="../../images/gamezone/setoptions.png" 
+       alt="Screenshot showing configured options" 
+       style="max-width:100%; border:1px solid #ccc; padding:5px;">
+
+  <p>The options we need to set are as follows:</p>
+  <ul>
+    <li><strong>password</strong> — videogamer124</li>
+    <li><strong>RHOSTS</strong> — localhost</li>
+    <li><strong>SSL</strong> — off</li>
+    <li><strong>USERNAME</strong> — agent47</li>
+    <li><strong>payload</strong> — cmd/unix/reverse</li>
+  </ul>
+
+  <br>
+
+  <article>
+    <p>
+      For this payload to work, the port forwarding we set up earlier must still be active. Once everything is configured, run the exploit to gain a shell and retrieve the root flag.
+    </p>
+  </article> 
+
+  <img src="../../images/gamezone/root.png" 
+       alt="Screenshot showing root access" 
+       style="max-width:100%; border:1px solid #ccc; padding:5px;">
+
+  </section>     
+
+  <footer>
+    <p>© Teddy's Infosec Journal</p>
+  </footer>
+</body>
+</html>
