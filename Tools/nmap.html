@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>nmap</title>
+  <link rel="stylesheet" href="tools.css">
+</head>
+<body>
+  <header>
+    <h1>🔍 nmap</h1>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../writeups/index.html">Write-Ups</a>
+      <a href="list.html">Tools</a>
+    </nav>
+  </header>
+
+  <main>
+    <h2>Overview</h2>
+    <p>
+      <strong>nmap</strong> (Network Mapper) is a powerful open-source tool used for network discovery, host enumeration, and vulnerability scanning. It’s a staple in penetration testing and red team operations.
+    </p>
+
+    <h2>Core Capabilities</h2>
+    <ul>
+      <li>Host discovery</li>
+      <li>Port scanning (TCP/UDP)</li>
+      <li>Service version detection</li>
+      <li>Operating system fingerprinting</li>
+      <li>Scriptable vulnerability scanning (via NSE)</li>
+    </ul>
+
+    <h2>Basic Scan</h2>
+    <code>nmap &lt;target&gt;</code>
+    <p>Performs a default scan: top 1000 TCP ports with SYN scan.</p>
+
+    <h2>Commonly Used Flags</h2>
+    <ul>
+      <li><strong>-sS</strong> — TCP SYN scan (stealthy and fast)</li>
+      <li><strong>-sT</strong> — TCP connect scan (less stealthy)</li>
+      <li><strong>-sU</strong> — UDP scan</li>
+      <li><strong>-p-</strong> — Scan all 65535 ports</li>
+      <li><strong>-sV</strong> — Detect service versions</li>
+      <li><strong>-O</strong> — OS detection</li>
+      <li><strong>-A</strong> — Aggressive scan (OS + version + script + traceroute)</li>
+      <li><strong>-Pn</strong> — Skip host discovery (treat host as online)</li>
+      <li><strong>-T4</strong> — Set timing template (T0–T5, higher = faster)</li>
+      <li><strong>-v</strong> — Verbose output</li>
+      <li><strong>-oN</strong> — Output to normal text file</li>
+      <li><strong>-oX</strong> — Output to XML</li>
+    </ul>
+
+    <h2>Examples</h2>
+
+    <h3>Scan all ports and detect services</h3>
+    <code>nmap -sS -sV -p- &lt;target&gt;</code>
+
+    <h3>Aggressive scan with OS detection</h3>
+    <code>nmap -A &lt;target&gt;</code>
+
+    <h3>Scan multiple targets</h3>
+    <code>nmap &lt;target1&gt; &lt;target2&gt; &lt;target3&gt;</code>
+
+    <h3>Scan a subnet</h3>
+    <code>nmap 192.168.1.0/24</code>
+
+    <h3>Scan from a list of IPs</h3>
+    <code>nmap -iL targets.txt</code>
+
+    <h3>Save output to file</h3>
+    <code>nmap -sV &lt;target&gt; -oN scan.txt</code>
+
+    <h2>Advanced: Nmap Scripting Engine (NSE)</h2>
+    <p>
+      NSE allows you to run scripts for vulnerability detection, brute forcing, and more.
+    </p>
+
+    <h3>Run default scripts</h3>
+    <code>nmap -sC &lt;target&gt;</code>
+
+    <h3>Run specific script</h3>
+    <code>nmap --script=http-title &lt;target&gt;</code>
+
+    <h3>Run script category</h3>
+    <code>nmap --script=vuln &lt;target&gt;</code>
+
+    <h2>Pro Tips</h2>
+    <ul>
+      <li>Use <code>-Pn</code> if ICMP is blocked — it skips ping checks.</li>
+      <li>Use <code>-T4</code> for faster scans, but avoid <code>-T5</code> unless you know the target can handle it.</li>
+      <li>Use <code>--open</code> to show only open ports.</li>
+      <li>Use <code>--reason</code> to see why a port is marked open/closed.</li>
+    </ul>
+
+    <h2>Output Formats</h2>
+    <ul>
+      <li><strong>-oN</strong> — Normal text</li>
+      <li><strong>-oX</strong> — XML</li>
+      <li><strong>-oG</strong> — Grepable</li>
+      <li><strong>-oA</strong> — All formats at once</li>
+    </ul>
+
+    <h2>Useful NSE Script Categories</h2>
+    <ul>
+      <li><strong>auth</strong> — Authentication bypass checks</li>
+      <li><strong>default</strong> — Safe and useful default scripts</li>
+      <li><strong>discovery</strong> — Network discovery scripts</li>
+      <li><strong>vuln</strong> — Vulnerability detection</li>
+      <li><strong>brute</strong> — Brute-force login attempts</li>
+    </ul>
+
+    <h2>Final Thoughts</h2>
+    <p>
+      nmap is more than just a port scanner — it’s a reconnaissance powerhouse. Mastering its flags and scripting engine gives you deep insight into any target. Whether you're mapping a network or probing for weaknesses, nmap is your first weapon.
+    </p>
+  </main>
+
+  <footer>
+    <p>© 2025 CyberGeek92 | nmap mastery unlocked 🧠</p>
+  </footer>
+</body>
+</html>

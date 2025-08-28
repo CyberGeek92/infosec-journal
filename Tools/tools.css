@@ -1,0 +1,105 @@
+/* === Matrix Theme Cybersecurity Tools CSS === */
+
+body {
+  background-color: #000;
+  color: #00ff00;
+  font-family: 'Courier New', monospace;
+  margin: 0;
+  padding: 0;
+  background-image: radial-gradient(circle at center, #001100 0%, #000000 100%);
+}
+
+header, footer {
+  background-color: #000;
+  border-bottom: 2px solid #00ff00;
+  padding: 20px;
+  text-align: center;
+}
+
+h1, h2, h3 {
+  color: #00ff00;
+  border-bottom: 1px solid #00ff00;
+  padding-bottom: 5px;
+  text-shadow: 0 0 5px #00ff00;
+}
+
+nav a {
+  color: #00ff00;
+  margin: 0 10px;
+  text-decoration: none;
+}
+
+nav a:hover {
+  color: #00cc00;
+  text-shadow: 0 0 10px #00ff00;
+}
+
+ul.tool-list {
+  list-style: none;
+  padding: 0;
+}
+
+ul.tool-list li {
+  background-color: #000;
+  border: 1px solid #00ff00;
+  padding: 10px;
+  margin-bottom: 10px;
+  transition: all 0.2s ease-in-out;
+}
+
+ul.tool-list li:hover {
+  background-color: #001a00;
+  box-shadow: 0 0 10px #00ff00;
+}
+
+/* Gold tool names */
+.tool-list li a {
+  color: #ffd700; /* gold */
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 1.1em;
+  text-shadow: 0 0 5px #ffd700;
+}
+
+.tool-list li a:hover {
+  color: #fff700; /* brighter gold on hover */
+  text-shadow: 0 0 10px #fff700;
+}
+
+.tool-detail {
+  display: none;
+  padding: 15px;
+  border: 1px solid #00ff00;
+  background-color: #000;
+  margin-bottom: 20px;
+}
+
+code {
+  background-color: #001a00;
+  color: #00ff00;
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-block;
+  box-shadow: 0 0 10px #00ff00;
+}
+
+input, button {
+  background-color: #000;
+  color: #00ff00;
+  border: 1px solid #00ff00;
+  padding: 5px;
+  margin-top: 10px;
+  border-radius: 4px;
+}
+
+button:hover {
+  background-color: #001a00;
+  cursor: pointer;
+  box-shadow: 0 0 5px #00ff00;
+}
+
+footer p {
+  font-size: 0.9em;
+  color: #00ff00;
+  text-shadow: 0 0 3px #00ff00;
+}

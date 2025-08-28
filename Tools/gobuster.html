@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Gobuster</title>
+  <link rel="stylesheet" href="tools.css">
+</head>
+<body>
+  <header>
+    <h1>🧨 Gobuster</h1>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../writeups/index.html">Write-Ups</a>
+      <a href="list.html">Tools</a>
+    </nav>
+  </header>
+
+  <main>
+    <h2>Overview</h2>
+    <p>
+      <strong>Gobuster</strong> is a fast, command-line brute-forcing tool written in Go. It's used to discover hidden directories, files, DNS subdomains, and virtual hosts on web servers. Unlike tools like Dirb or Dirbuster, Gobuster is optimized for speed and minimal resource usage.
+    </p>
+
+    <h2>Core Capabilities</h2>
+    <ul>
+      <li>Directory and file brute-forcing</li>
+      <li>DNS subdomain enumeration</li>
+      <li>Virtual host discovery</li>
+      <li>S3 bucket enumeration</li>
+      <li>Custom HTTP headers and status filtering</li>
+    </ul>
+
+    <h2>Basic Directory Scan</h2>
+    <code>gobuster dir -u http://target.com -w /usr/share/wordlists/dirb/common.txt</code>
+    <p>Scans for directories using the provided wordlist.</p>
+
+    <h2>Common Flags</h2>
+    <ul>
+      <li><strong>dir</strong> — Directory/file brute-forcing mode</li>
+      <li><strong>dns</strong> — DNS subdomain enumeration mode</li>
+      <li><strong>vhost</strong> — Virtual host brute-forcing mode</li>
+      <li><strong>s3</strong> — S3 bucket enumeration mode</li>
+      <li><strong>-u</strong> — Target URL</li>
+      <li><strong>-w</strong> — Wordlist path</li>
+      <li><strong>-t</strong> — Number of concurrent threads (default: 10)</li>
+      <li><strong>-x</strong> — File extensions to append (e.g., `.php,.txt`)</li>
+      <li><strong>-e</strong> — Expanded mode (adds `/` to directory hits)</li>
+      <li><strong>-r</strong> — Follow redirects</li>
+      <li><strong>-s</strong> — Filter by status code (e.g., `200,204,301`)</li>
+      <li><strong>-b</strong> — Hide status codes (e.g., `404`)</li>
+      <li><strong>-k</strong> — Skip SSL certificate verification</li>
+      <li><strong>-o</strong> — Output results to file</li>
+      <li><strong>-q</strong> — Quiet mode (minimal output)</li>
+    </ul>
+
+    <h2>Examples</h2>
+
+    <h3>Directory scan with common wordlist</h3>
+    <code>gobuster dir -u http://10.10.10.10 -w /usr/share/wordlists/dirb/common.txt</code>
+
+    <h3>Scan with file extensions</h3>
+    <code>gobuster dir -u http://target.com -w wordlist.txt -x php,html,txt</code>
+
+    <h3>Filter by status codes</h3>
+    <code>gobuster dir -u http://target.com -w wordlist.txt -s 200,301</code>
+
+    <h3>Hide 404 responses</h3>
+    <code>gobuster dir -u http://target.com -w wordlist.txt -b 404</code>
+
+    <h3>DNS subdomain enumeration</h3>
+    <code>gobuster dns -d target.com -w subdomains.txt</code>
+
+    <h3>Virtual host brute-forcing</h3>
+    <code>gobuster vhost -u http://target.com -w vhosts.txt</code>
+
+    <h3>Save output to file</h3>
+    <code>gobuster dir -u http://target.com -w wordlist.txt -o gobuster-results.txt</code>
+
+    <h2>Pro Tips</h2>
+    <ul>
+      <li>Use <code>-t 50</code> or higher for faster scans (if the server can handle it).</li>
+      <li>Use <code>-x</code> to catch hidden files like <code>index.php</code> or <code>config.txt</code>.</li>
+      <li>Use <code>-r</code> to follow redirects and avoid false negatives.</li>
+      <li>Use <code>-s</code> and <code>-b</code> together to fine-tune output visibility.</li>
+      <li>Use <code>-k</code> when scanning HTTPS targets with self-signed certs.</li>
+    </ul>
+
+    <h2>Output Formats</h2>
+    <ul>
+      <li><strong>-o</strong> — Save results to a file</li>
+      <li><strong>-q</strong> — Quiet mode (only valid results)</li>
+    </ul>
+
+    <h2>Final Thoughts</h2>
+    <p>
+      Gobuster is a must-have for web enumeration. Its speed, flexibility, and precision make it ideal for discovering hidden content, misconfigured virtual hosts, and overlooked subdomains. Mastering its flags lets you tailor scans for stealth, speed, or depth — depending on your target and objective.
+    </p>
+  </main>
+
+  <footer>
+    <p>© 2025 CyberGeek92 | Gobuster unleashed 🧠</p>
+  </footer>
+</body>
+</html>
