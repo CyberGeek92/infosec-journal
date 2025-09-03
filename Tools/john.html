@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>John the Ripper</title>
+  <link rel="stylesheet" href="tools.css">
+</head>
+<body>
+  <header>
+    <h1>🔓 John the Ripper</h1>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="../Write-Ups/index.html">Write-Ups</a>
+      <a href="list.html">Tools</a>
+    </nav>
+  </header>
+
+  <main>
+    <h2>Overview</h2>
+    <p>
+      <strong>John the Ripper</strong> (JtR) is a fast, flexible password cracker used to audit password strength and recover plaintext credentials from hashed values. It supports a wide range of hash formats and integrates with custom wordlists and cracking rules.
+    </p>
+
+    <h2>Core Capabilities</h2>
+    <ul>
+      <li>Crack password hashes using dictionary, brute-force, and hybrid attacks</li>
+      <li>Supports dozens of hash formats (MD5, SHA, NTLM, bcrypt, etc.)</li>
+      <li>Customizable cracking rules and masks</li>
+      <li>Supports incremental and single mode attacks</li>
+      <li>Works with hash dumps from /etc/shadow, SAM files, and CTF challenges</li>
+    </ul>
+
+    <h2>Basic Usage</h2>
+    <code>john --wordlist=rockyou.txt hash.txt</code>
+    <p>Cracks hashes in <code>hash.txt</code> using the <code>rockyou.txt</code> wordlist.</p>
+
+    <h2>Common Flags</h2>
+    <ul>
+      <li><strong>--wordlist=</strong> — Specify a dictionary file</li>
+      <li><strong>--format=</strong> — Define hash type (e.g., <code>raw-md5</code>, <code>nt</code>, <code>sha256crypt</code>)</li>
+      <li><strong>--rules</strong> — Apply transformation rules to wordlist entries</li>
+      <li><strong>--show</strong> — Display cracked passwords</li>
+      <li><strong>--test</strong> — Benchmark cracking speed</li>
+      <li><strong>--incremental</strong> — Brute-force using character sets</li>
+      <li><strong>--mask=</strong> — Define custom brute-force patterns</li>
+      <li><strong>--single</strong> — Use login names as guesses</li>
+    </ul>
+
+    <h2>Examples</h2>
+
+    <h3>Crack MD5 hashes with rockyou</h3>
+    <code>john --wordlist=rockyou.txt --format=raw-md5 hash.txt</code>
+
+    <h3>Crack NTLM hashes</h3>
+    <code>john --wordlist=rockyou.txt --format=nt hash.txt</code>
+
+    <h3>Show cracked passwords</h3>
+    <code>john --show hash.txt</code>
+
+    <h3>Benchmark performance</h3>
+    <code>john --test</code>
+
+    <h3>Brute-force with incremental mode</h3>
+    <code>john --incremental hash.txt</code>
+
+    <h3>Use a custom mask (e.g., 8-digit numeric)</h3>
+    <code>john --mask='?d?d?d?d?d?d?d?d' hash.txt</code>
+
+    <h3>Apply rules to mutate wordlist</h3>
+    <code>john --wordlist=rockyou.txt --rules hash.txt</code>
+
+    <h2>Supported Hash Formats</h2>
+    <ul>
+      <li><strong>raw-md5</strong> — Plain MD5</li>
+      <li><strong>nt</strong> — Windows NTLM</li>
+      <li><strong>sha256crypt</strong> — Linux shadow file</li>
+      <li><strong>bcrypt</strong> — Blowfish-based hashes</li>
+      <li><strong>descrypt</strong> — Traditional UNIX DES</li>
+      <li><strong>LM</strong> — Legacy Windows LAN Manager</li>
+      <li><strong>sha512crypt</strong> — Modern Linux password hashes</li>
+    </ul>
+
+    <h2>Pro Tips</h2>
+    <ul>
+      <li>Use <code>john --list=formats</code> to see all supported hash types</li>
+      <li>Use <code>--rules</code> to catch variations like <code>Password123</code> or <code>p@ssw0rd</code></li>
+      <li>Use <code>--mask</code> for targeted brute-force (e.g., PINs, phone numbers)</li>
+      <li>Use <code>--format=auto</code> to let John guess the hash type (not always reliable)</li>
+      <li>Use <code>--fork=N</code> to parallelize cracking across CPU cores</li>
+    </ul>
+
+    <h2>Output & Results</h2>
+    <ul>
+      <li>Cracked passwords are stored in <code>~/.john/john.pot</code></li>
+      <li>Use <code>--show</code> to display cracked results</li>
+      <li>Use <code>--session=name</code> to save and resume cracking sessions</li>
+    </ul>
+
+    <h2>Final Thoughts</h2>
+    <p>
+      John the Ripper is a cornerstone of password auditing. Whether you're cracking CTF hashes or testing real-world security, mastering its modes, formats, and rules gives you serious leverage. Pair it with custom wordlists and masks to go beyond basic attacks and into precision cracking.
+    </p>
+  </main>
+
+  <footer>
+    <p>© 2025 CyberGeek92 | John the Ripper mastered 🧠</p>
+  </footer>
+</body>
+</html>

